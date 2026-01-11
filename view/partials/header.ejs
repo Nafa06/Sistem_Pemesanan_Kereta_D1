@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'TravelTrain' %></title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Flatpickr Calendar (jika dibutuhkan) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5', // Indigo
+                        secondary: '#EC4899', // Pink
+                        dark: '#1e1b4b',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+        /* Animasi Fade In */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeInUp 0.6s ease-out forwards; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+
+        /* Background Pattern yang Estetik */
+        body {
+            background-color: #F8FAFC;
+            background-image: radial-gradient(#E0E7FF 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        
+        /* Glass Effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* STYLE KALENDER ESTETIK (Indigo & Pink Theme) */
+        .flatpickr-calendar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 40px rgba(79, 70, 229, 0.2) !important;
+            border-radius: 1.5rem !important;
+            font-family: 'Poppins', sans-serif !important;
+            padding: 15px !important;
+        }
+        .flatpickr-months .flatpickr-month {
+            color: #1e1b4b !important;
+            fill: #1e1b4b !important;
+        }
+        .flatpickr-current-month .flatpickr-monthDropdown-months {
+            font-weight: 700 !important;
+        }
+        .flatpickr-weekdays .flatpickr-weekday {
+            color: #818cf8 !important;
+            font-weight: 600 !important;
+        }
+        .flatpickr-day {
+            border-radius: 10px !important;
+            color: #374151 !important;
+            transition: all 0.2s ease;
+        }
+        .flatpickr-day:hover {
+            background: #e0e7ff !important;
+            border-color: #e0e7ff !important;
+        }
+        /* HARI YANG DIPILIH (Gradient) */
+        .flatpickr-day.selected, 
+        .flatpickr-day.startRange, 
+        .flatpickr-day.endRange, 
+        .flatpickr-day.selected.inRange, 
+        .flatpickr-day.startRange.inRange, 
+        .flatpickr-day.endRange.inRange, 
+        .flatpickr-day.selected:focus, 
+        .flatpickr-day.startRange:focus, 
+        .flatpickr-day.endRange:focus, 
+        .flatpickr-day.selected:hover, 
+        .flatpickr-day.startRange:hover, 
+        .flatpickr-day.endRange:hover, 
+        .flatpickr-day.selected.prevMonthDay, 
+        .flatpickr-day.startRange.prevMonthDay, 
+        .flatpickr-day.endRange.prevMonthDay, 
+        .flatpickr-day.selected.nextMonthDay, 
+        .flatpickr-day.startRange.nextMonthDay, 
+        .flatpickr-day.endRange.nextMonthDay {
+            background: linear-gradient(135deg, #4F46E5, #EC4899) !important;
+            border-color: transparent !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4) !important;
+            font-weight: bold;
+        }
+        .flatpickr-day.today { border-color: #EC4899 !important; }
+    </style>
+</head>
+<body class="text-gray-700 flex flex-col min-h-screen">
