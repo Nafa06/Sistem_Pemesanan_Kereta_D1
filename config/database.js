@@ -1,7 +1,7 @@
 // TODO: Buat koneksi pool MySQL disini menggunakan Environment Variable (process.env)
 
 require("dotenv").config();
-const mysql = require("mysql2/promise");
+// ❌ HAPUS: const mysql = require('mysql2/promise'); =(berdasarkan dari routes/index.js)=
 
 // Bikin koneksi pool
 const db = mysql.createPool({
