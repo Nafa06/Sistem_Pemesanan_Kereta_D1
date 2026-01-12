@@ -173,4 +173,91 @@ router.post('/cancel-order', (req, res) => {
     }
 });
 
+// ==========================================
+// E. HALAMAN LOGIN
+// ==========================================
+router.get('/login', (req, res) => {
+    res.render('login', { getNamaKota });
+});
+
+router.post('/login', (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        // Validasi sederhana (dalam real app, periksa database)
+        if (email && password) {
+            // Simpan session atau token (simplified)
+            res.json({ 
+                status: 'success', 
+                message: 'Login berhasil!',
+                user: { email: email }
+            });
+        } else {
+            res.status(400).json({ 
+                status: 'error', 
+                message: 'Email dan password harus diisi' 
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 'error', message: 'Terjadi kesalahan' });
+    }
+});
+
+// ==========================================
+// F. HALAMAN PROMO
+// ==========================================
+// Data promo (hardcoded)
+const promoData = [
+    {
+        id: 1,
+        title: 'Diskon 25% Jakarta - Bandung',
+        deskripsi: 'Pesan tiket Argo Parahyangan dan dapatkan diskon hingga 25%',
+        potongan: '25%',
+        kodePromo: 'JKTBDG25',
+        validHingga: '2026-02-28',
+        icon: '🚂'
+    },
+    {
+        id: 2,
+        title: 'Beli 2 Gratis 1 Jakarta - Surabaya',
+        deskripsi: 'Promo spesial untuk rute Jakarta ke Surabaya, beli 2 tiket gratis 1',
+        potongan: '33%',
+        kodePromo: 'BUY2GET1',
+        validHingga: '2026-01-31',
+        icon: '🎉'
+    },
+    {
+        id: 3,
+        title: 'Cashback 20% Semua Rute',
+        deskripsi: 'Semua pembelian tiket kereta api mendapatkan cashback 20%',
+        potongan: '20%',
+        kodePromo: 'CASHBACK20',
+        validHingga: '2026-03-31',
+        icon: '💰'
+    },
+    {
+        id: 4,
+        title: 'Tiket Luxury Diskon 30%',
+        deskripsi: 'Tiket kelas luxury semua rute dengan diskon fantastis',
+        potongan: '30%',
+        kodePromo: 'LUXURY30',
+        validHingga: '2026-02-15',
+        icon: '✨'
+    },
+    {
+        id: 5,
+        title: 'Member Baru: Welcome Voucher Rp 50.000',
+        deskripsi: 'Daftar sekarang dan dapatkan voucher welcome Rp 50.000',
+        potongan: 'Rp 50K',
+        kodePromo: 'WELCOME50K',
+        validHingga: '2026-04-30',
+        icon: '🎁'
+    }
+];
+
+router.get('/promo', (req, res) => {
+    res.render('promo', { promoData, getNamaKota });
+});
+
 module.exports = router;
