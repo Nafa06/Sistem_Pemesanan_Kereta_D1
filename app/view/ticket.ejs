@@ -150,10 +150,32 @@
                             </div>
 
                             <% if (item.status !== 'Lunas') { %>
-                                <button onclick="bayarSekarang('<%= item.kode %>', '<%= item.harga %>')" 
-                                        class="w-full bg-gradient-to-r from-gray-900 to-gray-700 hover:to-gray-900 text-white font-bold py-3 rounded-xl shadow-lg transform hover:-translate-y-1 transition flex justify-center items-center gap-2">
-                                    <i class="fa-solid fa-wallet"></i> Bayar Sekarang
-                                </button>
+                                <div class="space-y-3">
+                                    <p class="text-sm font-semibold text-gray-600 mb-3">Pilih Metode Pembayaran:</p>
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <!-- Bank Transfer -->
+                                        <button onclick="bayarSekarang('<%= item.kode %>', '<%= item.harga %>', 'bank')" 
+                                                class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transform hover:-translate-y-1 transition flex flex-col justify-center items-center gap-2">
+                                            <i class="fa-solid fa-university text-lg"></i>
+                                            <span class="text-xs hidden sm:inline">Bank Transfer</span>
+                                            <span class="text-xs sm:hidden">Bank</span>
+                                        </button>
+                                        <!-- E-Wallet -->
+                                        <button onclick="bayarSekarang('<%= item.kode %>', '<%= item.harga %>', 'ewallet')" 
+                                                class="bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold py-3 rounded-xl shadow-lg transform hover:-translate-y-1 transition flex flex-col justify-center items-center gap-2">
+                                            <i class="fa-solid fa-mobile-screen text-lg"></i>
+                                            <span class="text-xs hidden sm:inline">E-Wallet</span>
+                                            <span class="text-xs sm:hidden">E-Wallet</span>
+                                        </button>
+                                        <!-- QRIS -->
+                                        <button onclick="bayarSekarang('<%= item.kode %>', '<%= item.harga %>', 'qris')" 
+                                                class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 rounded-xl shadow-lg transform hover:-translate-y-1 transition flex flex-col justify-center items-center gap-2">
+                                            <i class="fa-solid fa-qrcode text-lg"></i>
+                                            <span class="text-xs hidden sm:inline">QRIS</span>
+                                            <span class="text-xs sm:hidden">QRIS</span>
+                                        </button>
+                                    </div>
+                                </div>
                             <% } %>
                         </div>
 
@@ -184,15 +206,34 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // FUNGSI 1: BAYAR
-    function bayarSekarang(kode, harga) {
-        console.log("Tombol Bayar ditekan untuk:", kode); // Cek Console
+    function bayarSekarang(kode, harga, metode) {
+        console.log("Tombol Bayar ditekan untuk:", kode, "Metode:", metode);
+
+        let namaMetode = '';
+        let deskripsi = '';
+        
+        if (metode === 'bank') {
+            namaMetode = 'Bank Transfer';
+            deskripsi = 'Transfer ke rekening yang sudah disiapkan. Kode transfer akan dikirim melalui email.';
+        } else if (metode === 'ewallet') {
+            namaMetode = 'E-Wallet';
+            deskripsi = 'Bayar menggunakan OVO, GoPay, atau DANA. Proses pembayaran instan.';
+        } else if (metode === 'qris') {
+            namaMetode = 'QRIS';
+            deskripsi = 'Scan kode QRIS menggunakan aplikasi bank atau e-wallet Anda.';
+        }
 
         Swal.fire({
             title: 'Bayar Tiket?',
-            text: "Total: " + harga,
+            html: `<div class="text-left">
+                    <p class="mb-2"><strong>Total:</strong> ${harga}</p>
+                    <p class="mb-2"><strong>Metode:</strong> ${namaMetode}</p>
+                    <p class="text-sm text-gray-600">${deskripsi}</p>
+                   </div>`,
             icon: 'info',
             showCancelButton: true,
-            confirmButtonText: 'Bayar',
+            confirmButtonText: 'Lanjutkan Pembayaran',
+            cancelButtonText: 'Batal',
             confirmButtonColor: '#4F46E5'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -203,12 +244,12 @@
                 fetch('/pay-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ kode: kode })
+                    body: JSON.stringify({ kode: kode, metode: metode })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        Swal.fire('Lunas!', 'Tiket berhasil dibayar', 'success')
+                        Swal.fire('Lunas!', `Tiket berhasil dibayar via ${namaMetode}`, 'success')
                         .then(() => location.reload());
                     } else {
                         Swal.fire('Gagal', 'Terjadi kesalahan', 'error');
