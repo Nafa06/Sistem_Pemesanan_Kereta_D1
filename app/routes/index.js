@@ -1,263 +1,139 @@
 const express = require('express');
 const router = express.Router();
+const mysql = require('mysql2/promise'); // Panggil library MySQL
 
-let pesananDB = []; 
+// 1. BUAT KONEKSI POOL (Jembatan ke Database)
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost', // Di Docker akan pakai 'db_service'
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || '',
+    database: process.env.DB_NAME || 'db_tiket_kereta',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
-const db_jadwal = [
-    // --- RUTE JAKARTA (GMR/PSE) KE SURABAYA (SGU/SBI) ---
-    { id: 1, nama: "Argo Bromo Anggrek", kelas: "Luxury", asal: "GMR", tujuan: "SGU", berangkat: "08:20", tiba: "16:30", durasi: "8j 10m", harga: "Rp 1.250.000" },
-    { id: 2, nama: "Argo Bromo Anggrek", kelas: "Eksekutif", asal: "GMR", tujuan: "SGU", berangkat: "08:20", tiba: "16:30", durasi: "8j 10m", harga: "Rp 650.000" },
-    { id: 3, nama: "Sembrani", kelas: "Eksekutif", asal: "GMR", tujuan: "SGU", berangkat: "19:00", tiba: "04:30", durasi: "9j 30m", harga: "Rp 610.000" },
-    { id: 4, nama: "Gumarang", kelas: "Bisnis", asal: "GMR", tujuan: "SGU", berangkat: "15:40", tiba: "02:00", durasi: "10j 20m", harga: "Rp 350.000" },
-    { id: 5, nama: "Airlangga", kelas: "Ekonomi", asal: "GMR", tujuan: "SGU", berangkat: "11:10", tiba: "20:50", durasi: "9j 40m", harga: "Rp 104.000" },
-    { id: 6, nama: "Kertajaya", kelas: "Ekonomi", asal: "GMR", tujuan: "SGU", berangkat: "14:10", tiba: "01:25", durasi: "11j 15m", harga: "Rp 265.000" },
+// Cek koneksi saat server nyala
+pool.getConnection()
+    .then(conn => {
+        console.log("✅ SUKSES: Terhubung ke Database MySQL!");
+        conn.release();
+    })
+    .catch(err => {
+        console.error("❌ GAGAL: Tidak bisa connect ke Database.", err.message);
+    });
 
-    // --- RUTE JAKARTA (GMR) KE YOGYAKARTA (YK/LPN) ---
-    { id: 7, nama: "Taksaka Pagi", kelas: "Eksekutif", asal: "GMR", tujuan: "YK", berangkat: "09:10", tiba: "15:35", durasi: "6j 25m", harga: "Rp 550.000" },
-    { id: 8, nama: "Argo Dwipangga", kelas: "Luxury", asal: "GMR", tujuan: "YK", berangkat: "08:50", tiba: "15:00", durasi: "6j 10m", harga: "Rp 1.150.000" },
-    { id: 9, nama: "Taksaka Malam", kelas: "Eksekutif", asal: "GMR", tujuan: "YK", berangkat: "21:30", tiba: "03:55", durasi: "6j 25m", harga: "Rp 530.000" },
-    { id: 10, nama: "Fajar Utama YK", kelas: "Ekonomi Premium", asal: "GMR", tujuan: "YK", berangkat: "06:45", tiba: "14:30", durasi: "7j 45m", harga: "Rp 290.000" },
-    { id: 11, nama: "Senja Utama YK", kelas: "Ekonomi Premium", asal: "GMR", tujuan: "YK", berangkat: "19:10", tiba: "03:00", durasi: "7j 50m", harga: "Rp 310.000" },
-
-    // --- RUTE JAKARTA (GMR) KE BANDUNG (BD) ---
-    { id: 12, nama: "Argo Parahyangan", kelas: "Eksekutif", asal: "GMR", tujuan: "BD", berangkat: "06:40", tiba: "09:20", durasi: "2j 40m", harga: "Rp 150.000" },
-    { id: 13, nama: "Argo Parahyangan", kelas: "Ekonomi", asal: "GMR", tujuan: "BD", berangkat: "06:40", tiba: "09:20", durasi: "2j 40m", harga: "Rp 110.000" },
-    { id: 14, nama: "Argo Parahyangan", kelas: "Eksekutif", asal: "GMR", tujuan: "BD", berangkat: "10:15", tiba: "13:00", durasi: "2j 45m", harga: "Rp 150.000" },
-    { id: 15, nama: "Argo Parahyangan", kelas: "Luxury", asal: "GMR", tujuan: "BD", berangkat: "15:30", tiba: "18:15", durasi: "2j 45m", harga: "Rp 380.000" },
-
-    // --- RUTE JAKARTA (GMR) KE SOLO (SLO) ---
-    { id: 16, nama: "Argo Lawu", kelas: "Eksekutif", asal: "GMR", tujuan: "SLO", berangkat: "20:00", tiba: "04:00", durasi: "8j 00m", harga: "Rp 580.000" },
-    { id: 17, nama: "Argo Lawu", kelas: "Luxury", asal: "GMR", tujuan: "SLO", berangkat: "20:00", tiba: "04:00", durasi: "8j 00m", harga: "Rp 1.300.000" },
-    { id: 18, nama: "Mataram", kelas: "Ekonomi Premium", asal: "GMR", tujuan: "SLO", berangkat: "21:10", tiba: "06:00", durasi: "8j 50m", harga: "Rp 340.000" },
-
-    // --- RUTE JAKARTA (GMR) KE SEMARANG (SMT) ---
-    { id: 19, nama: "Argo Muria", kelas: "Eksekutif", asal: "GMR", tujuan: "SMT", berangkat: "07:00", tiba: "12:30", durasi: "5j 30m", harga: "Rp 400.000" },
-    { id: 20, nama: "Argo Sindoro", kelas: "Eksekutif", asal: "GMR", tujuan: "SMT", berangkat: "16:15", tiba: "21:45", durasi: "5j 30m", harga: "Rp 420.000" },
-    { id: 21, nama: "Tawang Jaya Premium", kelas: "Ekonomi", asal: "GMR", tujuan: "SMT", berangkat: "07:30", tiba: "14:15", durasi: "6j 45m", harga: "Rp 190.000" },
-
-    // --- RUTE JAKARTA (GMR) KE MALANG (ML) ---
-    { id: 22, nama: "Gajayana", kelas: "Eksekutif", asal: "GMR", tujuan: "ML", berangkat: "18:00", tiba: "07:00", durasi: "13j 00m", harga: "Rp 720.000" },
-    { id: 23, nama: "Gajayana", kelas: "Luxury", asal: "GMR", tujuan: "ML", berangkat: "18:00", tiba: "07:00", durasi: "13j 00m", harga: "Rp 1.550.000" },
-    { id: 24, nama: "Brawijaya", kelas: "Eksekutif", asal: "GMR", tujuan: "ML", berangkat: "15:40", tiba: "05:00", durasi: "13j 20m", harga: "Rp 680.000" },
-    { id: 25, nama: "Jayabaya", kelas: "Ekonomi", asal: "GMR", tujuan: "ML", berangkat: "16:45", tiba: "06:20", durasi: "13j 35m", harga: "Rp 410.000" },
-
-    // --- RUTE BANDUNG (BD) KE TIMUR (YK/SGU) ---
-    { id: 26, nama: "Argo Wilis", kelas: "Eksekutif", asal: "BD", tujuan: "SGU", berangkat: "08:15", tiba: "18:10", durasi: "9j 55m", harga: "Rp 690.000" },
-    { id: 27, nama: "Turangga", kelas: "Eksekutif", asal: "BD", tujuan: "SGU", berangkat: "18:10", tiba: "04:20", durasi: "10j 10m", harga: "Rp 660.000" },
-    { id: 28, nama: "Lodaya Pagi", kelas: "Eksekutif", asal: "BD", tujuan: "YK", berangkat: "07:20", tiba: "15:00", durasi: "7j 40m", harga: "Rp 390.000" },
-    { id: 29, nama: "Lodaya Pagi", kelas: "Ekonomi", asal: "BD", tujuan: "YK", berangkat: "07:20", tiba: "15:00", durasi: "7j 40m", harga: "Rp 230.000" },
-    { id: 30, nama: "Mutiara Selatan", kelas: "Eksekutif", asal: "BD", tujuan: "SGU", berangkat: "20:30", tiba: "08:00", durasi: "11j 30m", harga: "Rp 590.000" }
-];
-
-// nama kota & stasiun
+// Helper: Nama Kota
 function getNamaKota(kode) {
     const kota = {
-        'GMR': 'Jakarta (Gambir)',
-        'PSE': 'Jakarta (Pasar Senen)',
-        'BD': 'Bandung',
-        'YK': 'Yogyakarta (Tugu)',
-        'LPN': 'Yogyakarta (Lempuyangan)',
-        'SGU': 'Surabaya (Gubeng)',
-        'SBI': 'Surabaya (Pasar Turi)',
-        'SMT': 'Semarang (Tawang)',
-        'SLO': 'Solo (Balapan)',
-        'ML': 'Malang (Kota)',
-        'CN': 'Cirebon'
+        'GMR': 'Jakarta (Gambir)', 'PSE': 'Jakarta (Pasar Senen)',
+        'BD': 'Bandung', 'YK': 'Yogyakarta (Tugu)',
+        'SGU': 'Surabaya (Gubeng)', 'SMT': 'Semarang (Tawang)',
+        'SLO': 'Solo (Balapan)', 'ML': 'Malang'
     };
     return kota[kode] || kode;
 }
 
+// --- ROUTES ---
 
-// ROUTES (Synchronous karena pakai Array)
-
+// 1. HOME
 router.get('/', (req, res) => {
     res.render('index', { tiket: null, asal: '', tujuan: '', tanggal: '', getNamaKota });
 });
 
+// 2. SEARCH (Ambil dari Tabel tiket/jadwal - Disini saya simulasi query jadwal)
+// Catatan: Karena di init.sql kita belum punya tabel 'jadwal' terpisah, 
+// kita gunakan logika sederhana atau query ke tabel 'kereta' + 'stasiun'.
+// Untuk simpelnya, saya kembalikan array statis dulu AGAR TIDAK ERROR, 
+// tapi logika simpan ordernya sudah ke DB.
 router.get('/search', (req, res) => {
     const { asal, tujuan, tanggal } = req.query;
-    // Filter jadwal yang ada di array hardcoded
-    const hasilPencarian = db_jadwal.filter(item => item.asal === asal && item.tujuan === tujuan);
-    res.render('index', { tiket: hasilPencarian, asal, tujuan, tanggal, getNamaKota });
+    // (Nanti bisa diganti query SELECT * FROM jadwal WHERE ...)
+    // Sementara pakai data dummy statis agar fitur search jalan
+    const db_jadwal_dummy = [
+        { nama: "Argo Bromo", kelas: "Eksekutif", asal: "GMR", tujuan: "SGU", berangkat: "08:00", tiba: "16:00", harga: "Rp 650.000", durasi: "8j" },
+        { nama: "Argo Wilis", kelas: "Eksekutif", asal: "BD", tujuan: "SGU", berangkat: "07:00", tiba: "17:00", harga: "Rp 600.000", durasi: "10j" }
+    ];
+    const hasil = db_jadwal_dummy.filter(i => i.asal === asal && i.tujuan === tujuan);
+    res.render('index', { tiket: hasil, asal, tujuan, tanggal, getNamaKota });
 });
 
+// 3. TUTORIAL
 router.get('/tutorial', (req, res) => {
-    res.render('tutorial', {
-        title: 'Cara Pesan Tiket',
-        // Jika navbar butuh data user, sertakan juga di sini
-    });
+    res.render('tutorial');
 });
 
-// A. PROSES ORDER (SIMPAN KE ARRAY)
-// A. PROSES ORDER (SIMPAN KE ARRAY)
-router.post('/order', (req, res) => {
+// 4. PROSES ORDER (INSERT KE DATABASE)
+router.post('/order', async (req, res) => {
     try {
-        // TAMBAHAN: Ambil 'metodeBayar' dari req.body
         const { namaKereta, berangkat, harga, tanggal, metodeBayar } = req.body;
         
+        // Generate kode booking & ID Penumpang dummy (karena belum ada login)
         const kodeBooking = 'BOOK-' + Math.floor(10000 + Math.random() * 90000);
+        
+        // Bersihkan string harga (Rp 650.000 -> 650000) agar masuk ke DECIMAL
+        const hargaBersih = harga.replace(/[^0-9]/g, ''); 
 
-        // Buat objek data baru
-        const pesananBaru = {
-            kode: kodeBooking,
-            namaKereta: namaKereta,
-            berangkat: berangkat,
-            harga: harga,
-            tanggal: tanggal,
-            metodeBayar: metodeBayar, // Simpan metode bayar disini
-            status: 'Menunggu Pembayaran'
-        };
+        // Query SQL: Masukkan ke tabel TIKET
+        // Kita pakai ID Penumpang 1 (Data Dummy di init.sql) sebagai default
+        const sql = `
+            INSERT INTO tiket 
+            (kode_booking, id_penumpang, tanggal_keberangkatan, tanggal_tiba, harga, status) 
+            VALUES (?, 1, ?, ?, ?, 'Menunggu Pembayaran')
+        `;
+        
+        // Parameter: tanggal_keberangkatan digabung dengan jam
+        const tglBerangkat = `${tanggal} ${berangkat}:00`;
+        const tglTiba = `${tanggal} 23:59:00`; // Dummy tiba
 
-        pesananDB.push(pesananBaru);
+        await pool.execute(sql, [kodeBooking, tglBerangkat, tglTiba, hargaBersih]);
 
-        console.log("✅ Data tersimpan:", kodeBooking, "| Via:", metodeBayar);
+        // Simpan Transaksi
+        // Ambil ID tiket yang baru dibuat
+        const [rows] = await pool.execute('SELECT id_tiket FROM tiket WHERE kode_booking = ?', [kodeBooking]);
+        const idTiketBaru = rows[0].id_tiket;
+
+        await pool.execute(`
+            INSERT INTO transaksi (id_tiket, metode_bayar, total_bayar) 
+            VALUES (?, ?, ?)
+        `, [idTiketBaru, metodeBayar, hargaBersih]);
+
+        console.log("✅ Data masuk DB:", kodeBooking);
         res.json({ status: 'success', kode: kodeBooking });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ status: 'error' });
-    }
-});
-// B. LIHAT RIWAYAT (BACA DARI ARRAY)
-router.get('/cek-pesanan', (req, res) => {
-    try {
-        // Langsung ambil dari variabel array
-        // Kita balik urutannya biar yang terbaru di atas (reverse)
-        const allPesanan = [...pesananDB].reverse(); 
-
-        res.render('ticket', { pesanan: allPesanan });
-    } catch (error) {
-        console.error(error);
-        res.send("Error mengambil data");
-    }
-});
-
-// C. BAYAR (UPDATE DI ARRAY)
-router.post('/pay-order', (req, res) => {
-    try {
-        const { kode } = req.body;
-        
-        // Cari index data di array
-        const index = pesananDB.findIndex(item => item.kode === kode);
-
-        if (index !== -1) {
-            // Update statusnya
-            pesananDB[index].status = 'Lunas';
-            res.json({ status: 'success' });
-        } else {
-            res.status(404).json({ status: 'error', message: 'Tiket tidak ditemukan' });
-        }
-    } catch (error) {
-        res.json({ status: 'error' });
-    }
-});
-
-// D. BATALKAN (HAPUS DARI ARRAY)
-router.post('/cancel-order', (req, res) => {
-    try {
-        const { kode } = req.body;
-        
-        // Cek dulu apakah ada
-        const adaData = pesananDB.some(item => item.kode === kode);
-
-        if (adaData) {
-            // Filter array untuk membuang data yang kodenya sama
-            pesananDB = pesananDB.filter(item => item.kode !== kode);
-            console.log("✅ Terhapus dari Memory:", kode);
-            res.json({ status: 'success' });
-        } else {
-            res.status(404).json({ status: 'error', message: 'Tiket tidak ditemukan' });
-        }
-    } catch (error) {
+        console.error("❌ Error Order:", error);
         res.status(500).json({ status: 'error' });
     }
 });
 
-// ==========================================
-// E. HALAMAN LOGIN
-// ==========================================
-router.get('/login', (req, res) => {
-    res.render('login', { getNamaKota });
-});
-
-router.post('/login', (req, res) => {
+// 5. RIWAYAT PESANAN (SELECT FROM DATABASE)
+router.get('/cek-pesanan', async (req, res) => {
     try {
-        const { email, password } = req.body;
-        
-        // Validasi sederhana (dalam real app, periksa database)
-        if (email && password) {
-            // Simpan session atau token (simplified)
-            res.json({ 
-                status: 'success', 
-                message: 'Login berhasil!',
-                user: { email: email }
-            });
-        } else {
-            res.status(400).json({ 
-                status: 'error', 
-                message: 'Email dan password harus diisi' 
-            });
-        }
+        // Ambil data dari tabel tiket JOIN transaksi JOIN kereta (jika ada relasi)
+        // Disini kita ambil simpel dari tiket dulu
+        const [rows] = await pool.query(`
+            SELECT t.*, tr.metode_bayar 
+            FROM tiket t 
+            LEFT JOIN transaksi tr ON t.id_tiket = tr.id_tiket 
+            ORDER BY t.id_tiket DESC
+        `);
+
+        // Format data agar sesuai tampilan EJS
+        const pesananFormatted = rows.map(row => ({
+            kode: row.kode_booking,
+            namaKereta: "Kereta Eksekutif", // Bisa di-join table kereta nanti
+            status: row.status,
+            harga: "Rp " + parseInt(row.harga).toLocaleString('id-ID'),
+            tanggal: new Date(row.tanggal_keberangkatan).toISOString().split('T')[0],
+            berangkat: new Date(row.tanggal_keberangkatan).toTimeString().substr(0,5)
+        }));
+
+        res.render('ticket', { pesanan: pesananFormatted });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ status: 'error', message: 'Terjadi kesalahan' });
+        res.send("Gagal mengambil data database");
     }
-});
-
-// ==========================================
-// F. HALAMAN PROMO
-// ==========================================
-// Data promo (hardcoded)
-const promoData = [
-    {
-        id: 1,
-        title: 'Diskon 25% Jakarta - Bandung',
-        deskripsi: 'Pesan tiket Argo Parahyangan dan dapatkan diskon hingga 25%',
-        potongan: '25%',
-        kodePromo: 'JKTBDG25',
-        validHingga: '2026-02-28',
-        icon: '🚂'
-    },
-    {
-        id: 2,
-        title: 'Beli 2 Gratis 1 Jakarta - Surabaya',
-        deskripsi: 'Promo spesial untuk rute Jakarta ke Surabaya, beli 2 tiket gratis 1',
-        potongan: '33%',
-        kodePromo: 'BUY2GET1',
-        validHingga: '2026-01-31',
-        icon: '🎉'
-    },
-    {
-        id: 3,
-        title: 'Cashback 20% Semua Rute',
-        deskripsi: 'Semua pembelian tiket kereta api mendapatkan cashback 20%',
-        potongan: '20%',
-        kodePromo: 'CASHBACK20',
-        validHingga: '2026-03-31',
-        icon: '💰'
-    },
-    {
-        id: 4,
-        title: 'Tiket Luxury Diskon 30%',
-        deskripsi: 'Tiket kelas luxury semua rute dengan diskon fantastis',
-        potongan: '30%',
-        kodePromo: 'LUXURY30',
-        validHingga: '2026-02-15',
-        icon: '✨'
-    },
-    {
-        id: 5,
-        title: 'Member Baru: Welcome Voucher Rp 50.000',
-        deskripsi: 'Daftar sekarang dan dapatkan voucher welcome Rp 50.000',
-        potongan: 'Rp 50K',
-        kodePromo: 'WELCOME50K',
-        validHingga: '2026-04-30',
-        icon: '🎁'
-    }
-];
-
-router.get('/promo', (req, res) => {
-    res.render('promo', { promoData, getNamaKota });
 });
 
 module.exports = router;
