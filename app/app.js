@@ -10,8 +10,9 @@ const indexRouter = require('./routes/index');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'view'));
 
-// Middleware (Untuk membaca input form & file static)
+// Middleware (Untuk membaca input form & JSON & file static)
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ==========================================
@@ -20,22 +21,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Gunakan indexRouter untuk semua URL yang dimulai dari '/'
 app.use('/', indexRouter);
 
-// ... (kode routes di atas) ...
-
-app.use('/', indexRouter);
-
-// --- TAMBAHKAN INI UNTUK 404 ---
+// --- 404 ERROR HANDLER ---
 app.use((req, res) => {
-    res.status(404).send(`
-        <h1 style="text-align:center; margin-top:50px;">404 - Halaman Tidak Ditemukan 😢</h1>
-        <p style="text-align:center;"><a href="/">Kembali ke Home</a></p>
-    `);
+    res.status(404).render('404', {});
 });
-
 
 // Jalankan Server
 app.listen(port, () => {
-    console.log(`Aplikasi Tiket Kereta berjalan di http://localhost:${port}`);
+    console.log(`✅ Aplikasi Tiket Kereta berjalan di http://localhost:${port}`);
 });
-
-// Jalankan Server
