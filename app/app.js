@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const port = process.env.APP_PORT || 5000;
+const port = process.env.APP_PORT || 3000;
 
 // Import file routes yang baru kita buat
 const indexRouter = require('./routes/index');
