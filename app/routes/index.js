@@ -1,20 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-// ❌ HAPUS: const mysql = require('mysql2/promise');
-// ❌ HAPUS: Koneksi database
-
-// ==========================================
-// 0. DATABASE SEMENTARA (PENGGANTI MYSQL)
-// ==========================================
-// Data akan disimpan di variabel ini selama server nyala.
-// Kalau server dimatikan/restart, data akan hilang (reset).
 let pesananDB = []; 
 
-
-// ==========================================
-// 1. DATA JADWAL KERETA (TETAP)
-// ==========================================
 const db_jadwal = [
     // --- RUTE JAKARTA (GMR/PSE) KE SURABAYA (SGU/SBI) ---
     { id: 1, nama: "Argo Bromo Anggrek", kelas: "Luxury", asal: "GMR", tujuan: "SGU", berangkat: "08:20", tiba: "16:30", durasi: "8j 10m", harga: "Rp 1.250.000" },
@@ -93,10 +81,20 @@ router.get('/search', (req, res) => {
     res.render('index', { tiket: hasilPencarian, asal, tujuan, tanggal, getNamaKota });
 });
 
+router.get('/tutorial', (req, res) => {
+    res.render('tutorial', {
+        title: 'Cara Pesan Tiket',
+        // Jika navbar butuh data user, sertakan juga di sini
+    });
+});
+
+// A. PROSES ORDER (SIMPAN KE ARRAY)
 // A. PROSES ORDER (SIMPAN KE ARRAY)
 router.post('/order', (req, res) => {
     try {
-        const { namaKereta, berangkat, harga, tanggal } = req.body;
+        // TAMBAHAN: Ambil 'metodeBayar' dari req.body
+        const { namaKereta, berangkat, harga, tanggal, metodeBayar } = req.body;
+        
         const kodeBooking = 'BOOK-' + Math.floor(10000 + Math.random() * 90000);
 
         // Buat objek data baru
@@ -106,13 +104,13 @@ router.post('/order', (req, res) => {
             berangkat: berangkat,
             harga: harga,
             tanggal: tanggal,
+            metodeBayar: metodeBayar, // Simpan metode bayar disini
             status: 'Menunggu Pembayaran'
         };
 
-        // PUSH ke Array (menggantikan INSERT INTO)
         pesananDB.push(pesananBaru);
 
-        console.log("✅ Data tersimpan di Memory:", kodeBooking);
+        console.log("✅ Data tersimpan:", kodeBooking, "| Via:", metodeBayar);
         res.json({ status: 'success', kode: kodeBooking });
 
     } catch (error) {
@@ -120,7 +118,6 @@ router.post('/order', (req, res) => {
         res.status(500).json({ status: 'error' });
     }
 });
-
 // B. LIHAT RIWAYAT (BACA DARI ARRAY)
 router.get('/cek-pesanan', (req, res) => {
     try {
