@@ -1,0 +1,248 @@
+<!-- Payment Modal -->
+<div id="paymentModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full animate-fade-in max-h-[90vh] overflow-y-auto">
+        
+        <!-- Close Button -->
+        <div class="sticky top-0 bg-gradient-to-r from-primary to-secondary p-6 flex justify-between items-center rounded-t-3xl">
+            <h2 class="font-heading text-2xl font-bold text-white">Konfirmasi Pembayaran</h2>
+            <button onclick="closePaymentModal()" class="text-white hover:bg-white/20 rounded-full p-2 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <!-- Kode Booking Info -->
+            <div class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 text-center">
+                <p class="text-xs text-gray-600 mb-1">Kode Booking</p>
+                <p id="modalKode" class="text-xl font-bold text-primary"></p>
+            </div>
+
+            <!-- Payment Method Display -->
+            <div id="bankTransferContent" class="space-y-4 hidden">
+                <div>
+                    <p class="text-sm font-semibold text-gray-700 mb-2">Pembayaran Virtual Akun Anda</p>
+                    <div class="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 font-mono text-center">
+                        <p id="virtualAccount" class="text-2xl font-bold text-gray-800 tracking-wide break-all"></p>
+                    </div>
+                </div>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                    <p class="text-sm text-yellow-800 font-semibold mb-2">
+                        <i class="fa-solid fa-hourglass-end mr-2"></i> Waktu Tersisa
+                    </p>
+                    <p id="bankTimeout" class="text-2xl font-bold text-yellow-600">01:00:00</p>
+                    <p class="text-xs text-yellow-700 mt-2">Transfer untuk menyelesaikan pembayaran</p>
+                </div>
+            </div>
+
+            <div id="ewalletContent" class="space-y-4 hidden">
+                <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 text-center space-y-3">
+                    <p class="text-sm font-semibold text-gray-700">Instruksi Pembayaran E-Wallet</p>
+                    <div class="bg-white p-4 rounded-lg space-y-2 text-left">
+                        <p class="text-sm">
+                            <span class="font-bold text-blue-600">1.</span>
+                            <span> Buka aplikasi E-Wallet Anda</span>
+                        </p>
+                        <p class="text-sm">
+                            <span class="font-bold text-blue-600">2.</span>
+                            <span> Pilih menu <strong>Transportasi</strong></span>
+                        </p>
+                        <p class="text-sm">
+                            <span class="font-bold text-blue-600">3.</span>
+                            <span> Masukkan Kode Booking: <strong id="ewalletKode"></strong></span>
+                        </p>
+                        <p class="text-sm">
+                            <span class="font-bold text-blue-600">4.</span>
+                            <span> Selesaikan pembayaran</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="qrisContent" class="space-y-4 hidden">
+                <div class="bg-green-50 border-2 border-green-300 rounded-xl p-6 text-center space-y-3">
+                    <p class="text-sm font-semibold text-gray-700 mb-4">Scan QR Code untuk Pembayaran</p>
+                    <div class="bg-white p-6 rounded-lg inline-block border-2 border-green-200">
+                        <svg id="qrcode" width="250" height="250"></svg>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-4">Gunakan aplikasi pembayaran QRIS untuk scan</p>
+                </div>
+            </div>
+
+            <!-- Payment Button -->
+            <button id="cekPembayaranBtn" onclick="cekPembayaran()" 
+                    class="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+                <i class="fa-solid fa-check-circle mr-2"></i>Cek Pembayaran
+            </button>
+
+            <!-- Cancel Button -->
+            <button onclick="closePaymentModal()" 
+                    class="w-full bg-gray-200 text-gray-800 font-bold py-3 rounded-xl hover:bg-gray-300 transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeInUp 0.3s ease-out; }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode.js/1.5.3/qrcode.min.js"></script>
+
+<script>
+    let currentPaymentData = {
+        kode: null,
+        harga: null,
+        metode: null,
+        timeoutInterval: null
+    };
+
+    function bayarSekarang(kode, harga, metode) {
+        currentPaymentData = { kode, harga, metode, timeoutInterval: null };
+        
+        // Tampilkan modal
+        document.getElementById('paymentModal').classList.remove('hidden');
+        document.getElementById('modalKode').textContent = kode;
+
+        // Sembunyikan semua content
+        document.getElementById('bankTransferContent').classList.add('hidden');
+        document.getElementById('ewalletContent').classList.add('hidden');
+        document.getElementById('qrisContent').classList.add('hidden');
+
+        if (metode === 'bank') {
+            showBankTransfer(kode);
+        } else if (metode === 'ewallet') {
+            showEwallet(kode);
+        } else if (metode === 'qris') {
+            showQRIS(kode);
+        }
+    }
+
+    function showBankTransfer(kode) {
+        document.getElementById('bankTransferContent').classList.remove('hidden');
+        
+        // Generate virtual account
+        const randomAccount = generateRandomAccount();
+        document.getElementById('virtualAccount').textContent = randomAccount;
+
+        // Start countdown timer
+        let timeLeft = 3600; // 1 hour in seconds
+        startCountdown(timeLeft);
+    }
+
+    function showEwallet(kode) {
+        document.getElementById('ewalletContent').classList.remove('hidden');
+        document.getElementById('ewalletKode').textContent = kode;
+    }
+
+    function showQRIS(kode) {
+        document.getElementById('qrisContent').classList.remove('hidden');
+        
+        // Generate QR Code
+        const qrcodeContainer = document.getElementById('qrcode');
+        qrcodeContainer.innerHTML = ''; // Clear previous
+        
+        new QRCode(qrcodeContainer, {
+            text: `TRAVELTRAINQRIS:${kode}`,
+            width: 250,
+            height: 250,
+            colorDark: "#1e1b4b",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    function generateRandomAccount() {
+        const bank = '801001'; // Contoh BCA
+        const random = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+        return bank + random;
+    }
+
+    function startCountdown(seconds) {
+        let remaining = seconds;
+
+        if (currentPaymentData.timeoutInterval) {
+            clearInterval(currentPaymentData.timeoutInterval);
+        }
+
+        const updateDisplay = () => {
+            const hours = Math.floor(remaining / 3600);
+            const minutes = Math.floor((remaining % 3600) / 60);
+            const secs = remaining % 60;
+            
+            const display = 
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
+                String(secs).padStart(2, '0');
+            
+            document.getElementById('bankTimeout').textContent = display;
+
+            if (remaining <= 0) {
+                clearInterval(currentPaymentData.timeoutInterval);
+                document.getElementById('bankTimeout').textContent = 'Waktu Habis';
+                document.getElementById('cekPembayaranBtn').disabled = true;
+            }
+            
+            remaining--;
+        };
+
+        updateDisplay();
+        currentPaymentData.timeoutInterval = setInterval(updateDisplay, 1000);
+    }
+
+    function cekPembayaran() {
+        const { kode, metode } = currentPaymentData;
+
+        if (!kode || !metode) {
+            alert('Data pembayaran tidak lengkap');
+            return;
+        }
+
+        // Disable button saat proses
+        const btn = document.getElementById('cekPembayaranBtn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Memproses...';
+
+        fetch('/confirm-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kode, metode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    title: 'Pembayaran Berhasil!',
+                    text: `Tiket ${kode} sudah dikonfirmasi`,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    closePaymentModal();
+                    location.reload();
+                });
+            } else {
+                Swal.fire('Gagal', data.message || 'Terjadi kesalahan', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Gagal menghubungi server', 'error');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.add('hidden');
+        if (currentPaymentData.timeoutInterval) {
+            clearInterval(currentPaymentData.timeoutInterval);
+        }
+    }
+</script>

@@ -7,8 +7,11 @@ WORKDIR /usr/src/app
 # Copy package.json dulu biar caching-nya optimal
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Hapus node_modules lama jika ada
+RUN rm -rf node_modules package-lock.json
+
+# Install dependencies baru
+RUN npm install --legacy-peer-deps
 
 # Copy sisa kodingan (app.js, views, dll)
 COPY . .
