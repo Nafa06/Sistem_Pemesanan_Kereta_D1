@@ -196,10 +196,6 @@
                     nyaman.
                 </p>
                 <div class="flex gap-4">
-                    <button
-                        class="bg-secondary hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-pink-500/30 transition transform hover:-translate-y-1">
-                        Daftar Sekarang
-                    </button>
                     <a href="/tutorial"
                         class="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold py-3 px-8 rounded-full transition inline-block text-center">
                         Pelajari Cara Pesan
@@ -520,7 +516,7 @@
             const hargaFormat = tiketElement.querySelector('[data-harga]').textContent;
             const hargaValue = tiketElement.querySelector('[data-harga-value]').getAttribute('data-harga-value');
 
-            // Tampilkan Konfirmasi SweetAlert dengan Pilihan Jumlah Penumpang
+            // Tampilkan Konfirmasi SweetAlert tanpa Pilihan Metode Pembayaran
             Swal.fire({
                 title: 'Konfirmasi Pesanan',
                 html: `
@@ -528,24 +524,17 @@
                         <p><strong>Kereta:</strong> ${namaKereta}</p>
                         <p><strong>Total Harga:</strong> <span class="text-primary font-bold text-lg">${hargaFormat}</span></p>
                     </div>
-                    <p class="text-gray-600">Pilih Metode Pembayaran:</p>
                 `,
-                input: 'radio',
-                inputOptions: {
-                    'bank': 'Transfer Bank (BCA/Mandiri)',
-                    'ewallet': 'E-Wallet (GoPay/OVO)',
-                    'qris': 'QRIS'
-                },
-                inputValue: 'bank',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#4F46E5',
                 cancelButtonColor: '#ef4444',
-                confirmButtonText: 'Bayar Sekarang',
+                confirmButtonText: 'Pesan Sekarang',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const metodeBayar = result.value;
+                    // Langsung proses dengan metode default (bank)
+                    const metodeBayar = 'bank';
                     lanjutkePembayaran(idTiket, metodeBayar);
                 }
             });
