@@ -1,60 +1,83 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TravelTrain - Jelajahi Dunia</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
 
     <style>
-        /* STYLE KALENDER ESTETIK (Indigo & Pink Theme) */
+        /* STYLE KALENDER ESTETIK */
         .flatpickr-calendar {
             background: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 10px 40px rgba(79, 70, 229, 0.2) !important;
             border-radius: 1.5rem !important;
             font-family: 'Poppins', sans-serif !important;
             padding: 15px !important;
             border: none !important;
+            z-index: 9999 !important;
         }
-        .flatpickr-months .flatpickr-month {
-            color: #1e1b4b !important;
-            fill: #1e1b4b !important;
-        }
-        .flatpickr-current-month .flatpickr-monthDropdown-months {
-            font-weight: 700 !important;
-        }
-        .flatpickr-weekdays .flatpickr-weekday {
-            color: #818cf8 !important;
-            font-weight: 600 !important;
-        }
-        .flatpickr-day {
-            border-radius: 10px !important;
-            color: #374151 !important;
-            transition: all 0.2s ease;
-        }
-        .flatpickr-day:hover {
-            background: #e0e7ff !important;
-            border-color: #e0e7ff !important;
-        }
-        /* HARI YANG DIPILIH (Gradient) */
-        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay, .flatpickr-day.selected.nextMonthDay, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.endRange.nextMonthDay {
+
+        .flatpickr-day.selected {
             background: linear-gradient(135deg, #4F46E5, #EC4899) !important;
             border-color: transparent !important;
-            color: white !important;
-            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4) !important;
             font-weight: bold;
         }
-        .flatpickr-day.today { border-color: #EC4899 !important; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c7c7c7;
+            border-radius: 4px;
+        }
+
+        /* Animasi */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        body {
+            background-color: #F8FAFC;
+            background-image: radial-gradient(#E0E7FF 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
     </style>
 
     <script>
@@ -74,64 +97,77 @@
             }
         }
     </script>
-
-    <style>
-        /* Animasi Fade In */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeInUp 0.6s ease-out forwards; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
-
-        /* Background Pattern yang Estetik */
-        body {
-            background-color: #F8FAFC;
-            background-image: radial-gradient(#E0E7FF 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        
-        /* Glass Effect */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-    </style>
 </head>
+
 <body class="text-gray-700 flex flex-col min-h-screen">
 
     <nav class="fixed w-full z-50 top-0 transition-all duration-300 glass-panel shadow-sm">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center gap-2 cursor-pointer group">
-                    <div class="w-10 h-10 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition transform">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition transform">
                         <i class="fa-solid fa-bolt text-xl"></i>
                     </div>
-                    <span class="font-heading font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                    <span
+                        class="font-heading font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
                         TravelTrain
                     </span>
                 </div>
-                
-                <div class="hidden md:flex space-x-8 font-medium text-gray-600">
+
+                <div class="hidden md:flex space-x-8 font-medium text-gray-600 items-center">
                     <a href="/cek-pesanan" class="hover:text-primary transition relative group">
                         Cek Pesanan
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+                        <span
+                            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
                     </a>
-                    <a href="/promo" class="hover:text-primary transition relative group">
-                        Promo
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-                    </a>
-                    <a href="/login" class="hover:text-primary transition relative group">
-                        Login
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-                    </a>
+
+                    <% if (session && session.userId) { %>
+                        <!-- User Logged In: Show Account Dropdown -->
+                        <div class="relative" id="accountDropdown">
+                            <button onclick="toggleAccountDropdown(event)"
+                                class="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition relative group">
+                                <i class="fa-solid fa-user-circle text-primary text-xl"></i>
+                                <% // Tampilkan nama user jika bukan akun 'Pelanggan Test' const
+                                    displayName=(session.nama && session.nama !=='Pelanggan Test' ) ? session.nama
+                                    : 'Akun' ; %>
+                                    <span class="font-semibold">
+                                        <%= displayName %>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div id="dropdownMenu"
+                                class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+                                <div class="bg-gradient-to-r from-primary to-secondary p-4 text-white">
+                                    <p class="text-xs opacity-80 mb-1">Logged in as</p>
+                                    <p class="font-semibold truncate">
+                                        <%= session.email %>
+                                    </p>
+                                </div>
+                                <div class="p-2">
+                                    <a href="/cek-pesanan"
+                                        class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 rounded-lg transition">
+                                        <i class="fa-solid fa-ticket text-primary"></i>
+                                        <span>Tiket Saya</span>
+                                    </a>
+                                    <a href="/logout"
+                                        class="flex items-center gap-3 px-4 py-2 hover:bg-red-50 text-red-600 rounded-lg transition mt-1">
+                                        <i class="fa-solid fa-right-from-bracket"></i>
+                                        <span>Logout</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <% } else { %>
+                            <!-- User Not Logged In: Show Login Link -->
+                            <a href="/login" class="hover:text-primary transition relative group">
+                                Login
+                                <span
+                                    class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+                            </a>
+                            <% } %>
                 </div>
             </div>
         </div>
@@ -139,29 +175,34 @@
 
     <div class="relative pt-32 pb-48 overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1517154596051-c636c3186d3e?q=80&w=1920&auto=format&fit=crop" 
-                 class="w-full h-full object-cover" alt="Train Background">
+            <img src="https://images.unsplash.com/photo-1517154596051-c636c3186d3e?q=80&w=1920&auto=format&fit=crop"
+                class="w-full h-full object-cover" alt="Train Background">
             <div class="absolute inset-0 bg-gradient-to-r from-dark/90 via-primary/70 to-transparent"></div>
         </div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div class="text-white animate-fade-in">
-                <span class="bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">
-                      Partner Perjalanan Terbaikmu
+                <span
+                    class="bg-white/20 backdrop-blur-sm border border-white/30 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">
+                    Partner Perjalanan Terbaikmu
                 </span>
                 <h1 class="font-heading text-5xl md:text-6xl font-extrabold leading-tight mb-4">
                     Jelajahi Indonesia <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300">Tanpa Batas</span>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-300">Tanpa
+                        Batas</span>
                 </h1>
                 <p class="text-lg text-gray-200 mb-8 max-w-lg">
-                    Pesan tiket kereta api eksekutif & luxury dengan harga terbaik. Bebas antre, proses cepat, liburan nyaman.
+                    Pesan tiket kereta api eksekutif & luxury dengan harga terbaik. Bebas antre, proses cepat, liburan
+                    nyaman.
                 </p>
                 <div class="flex gap-4">
-                    <button class="bg-secondary hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-pink-500/30 transition transform hover:-translate-y-1">
+                    <button
+                        class="bg-secondary hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-pink-500/30 transition transform hover:-translate-y-1">
                         Daftar Sekarang
                     </button>
-                    <a href="/tutorial" class="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold py-3 px-8 rounded-full transition inline-block text-center">
-                    Pelajari Cara Pesan
+                    <a href="/tutorial"
+                        class="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold py-3 px-8 rounded-full transition inline-block text-center">
+                        Pelajari Cara Pesan
                     </a>
                 </div>
             </div>
@@ -169,59 +210,81 @@
     </div>
 
     <div class="relative z-20 -mt-24 px-4">
-        <div class="max-w-5xl mx-auto glass-panel rounded-3xl p-6 md:p-10 shadow-2xl animate-fade-in" style="animation-delay: 0.2s;">
-            <form action="/search" method="GET" onsubmit="validasiPencarian(event)">
+        <div class="max-w-5xl mx-auto glass-panel rounded-3xl p-6 md:p-10 shadow-2xl animate-fade-in"
+            style="animation-delay: 0.2s;">
+            <form action="/search" method="GET" onsubmit="return validasiPencarian(event)" id="formCari">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    
+
                     <div class="group">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Dari Mana?</label>
-                        <div class="relative flex items-center bg-gray-50/50 border-2 border-transparent focus-within:border-primary rounded-2xl transition-all duration-300 group-hover:bg-white group-hover:shadow-md">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Dari
+                            Mana?</label>
+                        <div
+                            class="relative flex items-center bg-gray-50/50 border-2 border-transparent focus-within:border-primary rounded-2xl transition-all duration-300 group-hover:bg-white group-hover:shadow-md">
                             <i class="fa-solid fa-train-subway text-primary text-lg absolute left-4"></i>
-                            <select name="asal" id="asal" class="w-full bg-transparent py-4 pl-12 pr-4 outline-none font-semibold text-gray-700 cursor-pointer appearance-none">
+                            <select name="asal" id="asal"
+                                class="w-full bg-transparent py-4 pl-12 pr-4 outline-none font-semibold text-gray-700 cursor-pointer appearance-none">
                                 <option selected disabled value="">Pilih Stasiun</option>
-                                <option value="GMR" <%= asal === 'GMR' ? 'selected' : '' %>>Jakarta (Gambir)</option>
-                                <option value="BD" <%= asal === 'BD' ? 'selected' : '' %>>Bandung (BD)</option>
-                                <option value="YK" <%= asal === 'YK' ? 'selected' : '' %>>Yogyakarta (YK)</option>
-                                <option value="SGU" <%= asal === 'SGU' ? 'selected' : '' %>>Surabaya (SGU)</option>
-                                <option value="SMT" <%= asal === 'SMT' ? 'selected' : '' %>>Semarang (SMT)</option>
-                                <option value="SLO" <%= asal === 'SLO' ? 'selected' : '' %>>Solo (SLO)</option>
-                                <option value="ML" <%= asal === 'ML' ? 'selected' : '' %>>Malang (ML)</option>
-                                <option value="CN" <%= asal === 'CN' ? 'selected' : '' %>>Cirebon (CN)</option>
+                                <option value="GMR" <%=(typeof asal !=='undefined' && asal==='GMR' ) ? 'selected' : ''
+                                    %>>Jakarta (Gambir)</option>
+                                <option value="BD" <%=(typeof asal !=='undefined' && asal==='BD' ) ? 'selected' : '' %>
+                                    >Bandung (BD)</option>
+                                <option value="YK" <%=(typeof asal !=='undefined' && asal==='YK' ) ? 'selected' : '' %>
+                                    >Yogyakarta (YK)</option>
+                                <option value="SGU" <%=(typeof asal !=='undefined' && asal==='SGU' ) ? 'selected' : ''
+                                    %>>Surabaya (SGU)</option>
+                                <option value="SMT" <%=(typeof asal !=='undefined' && asal==='SMT' ) ? 'selected' : ''
+                                    %>>Semarang (SMT)</option>
+                                <option value="SLO" <%=(typeof asal !=='undefined' && asal==='SLO' ) ? 'selected' : ''
+                                    %>>Solo (SLO)</option>
+                                <option value="ML" <%=(typeof asal !=='undefined' && asal==='ML' ) ? 'selected' : '' %>
+                                    >Malang (ML)</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="group">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Ke Mana?</label>
-                        <div class="relative flex items-center bg-gray-50/50 border-2 border-transparent focus-within:border-primary rounded-2xl transition-all duration-300 group-hover:bg-white group-hover:shadow-md">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Ke
+                            Mana?</label>
+                        <div
+                            class="relative flex items-center bg-gray-50/50 border-2 border-transparent focus-within:border-primary rounded-2xl transition-all duration-300 group-hover:bg-white group-hover:shadow-md">
                             <i class="fa-solid fa-location-dot text-secondary text-lg absolute left-4"></i>
-                            <select name="tujuan" id="tujuan" class="w-full bg-transparent py-4 pl-12 pr-4 outline-none font-semibold text-gray-700 cursor-pointer appearance-none">
+                            <select name="tujuan" id="tujuan"
+                                class="w-full bg-transparent py-4 pl-12 pr-4 outline-none font-semibold text-gray-700 cursor-pointer appearance-none">
                                 <option selected disabled value="">Pilih Tujuan</option>
-                                <option value="GMR" <%= tujuan === 'GMR' ? 'selected' : '' %>>Jakarta (Gambir)</option>
-                                <option value="BD" <%= tujuan === 'BD' ? 'selected' : '' %>>Bandung (BD)</option>
-                                <option value="YK" <%= tujuan === 'YK' ? 'selected' : '' %>>Yogyakarta (YK)</option>
-                                <option value="SGU" <%= tujuan === 'SGU' ? 'selected' : '' %>>Surabaya (SGU)</option>
-                                <option value="SMT" <%= tujuan === 'SMT' ? 'selected' : '' %>>Semarang (SMT)</option>
-                                <option value="SLO" <%= tujuan === 'SLO' ? 'selected' : '' %>>Solo (SLO)</option>
-                                <option value="ML" <%= tujuan === 'ML' ? 'selected' : '' %>>Malang (ML)</option>
-                                <option value="CN" <%= tujuan === 'CN' ? 'selected' : '' %>>Cirebon (CN)</option>
+                                <option value="GMR" <%=(typeof tujuan !=='undefined' && tujuan==='GMR' ) ? 'selected'
+                                    : '' %>>Jakarta (Gambir)</option>
+                                <option value="BD" <%=(typeof tujuan !=='undefined' && tujuan==='BD' ) ? 'selected' : ''
+                                    %>>Bandung (BD)</option>
+                                <option value="YK" <%=(typeof tujuan !=='undefined' && tujuan==='YK' ) ? 'selected' : ''
+                                    %>>Yogyakarta (YK)</option>
+                                <option value="SGU" <%=(typeof tujuan !=='undefined' && tujuan==='SGU' ) ? 'selected'
+                                    : '' %>>Surabaya (SGU)</option>
+                                <option value="SMT" <%=(typeof tujuan !=='undefined' && tujuan==='SMT' ) ? 'selected'
+                                    : '' %>>Semarang (SMT)</option>
+                                <option value="SLO" <%=(typeof tujuan !=='undefined' && tujuan==='SLO' ) ? 'selected'
+                                    : '' %>>Solo (SLO)</option>
+                                <option value="ML" <%=(typeof tujuan !=='undefined' && tujuan==='ML' ) ? 'selected' : ''
+                                    %>>Malang (ML)</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="group">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Kapan?</label>
-                        <div class="relative flex items-center bg-gray-50/50 border-2 border-transparent focus-within:border-primary rounded-2xl transition-all duration-300 group-hover:bg-white group-hover:shadow-md">
-                           <i class="fa-regular fa-calendar-days text-primary text-lg absolute left-4 z-10"></i>
-                           <input type="text" name="tanggal" id="tanggal" 
-                                    placeholder="Pilih Tanggal..." 
-                                    value="<%= tanggal %>" 
-                            class="w-full bg-transparent py-4 pl-12 pr-4 outline-none font-semibold text-gray-700 cursor-pointer">
+                    <div class="group" style="position: relative; z-index: 10;">
+                        <label
+                            class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 ml-1">Kapan?</label>
+                        <div
+                            class="relative flex items-center bg-gray-50/50 border-2 border-transparent focus-within:border-primary rounded-2xl transition-all duration-300 group-hover:bg-white group-hover:shadow-md">
+                            <i
+                                class="fa-regular fa-calendar-days text-primary text-lg absolute left-4 z-10 pointer-events-none"></i>
+                            <input type="text" name="tanggal" id="tanggal" placeholder="Pilih Tanggal..."
+                                value="<%= (typeof tanggal !== 'undefined') ? tanggal : '' %>"
+                                class="w-full bg-transparent py-4 pl-12 pr-4 outline-none font-semibold text-gray-700 cursor-pointer">
                         </div>
                     </div>
 
                     <div class="flex items-end">
-                        <button type="submit" class="w-full h-[58px] bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-600 hover:to-primary text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transform hover:-translate-y-1 transition duration-200 flex items-center justify-center gap-2">
+                        <button type="submit"
+                            class="w-full h-[58px] bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-600 hover:to-primary text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/30 transform hover:-translate-y-1 transition duration-200 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-magnifying-glass"></i> Cari Tiket
                         </button>
                     </div>
@@ -232,28 +295,34 @@
     </div>
 
     <div class="flex-grow max-w-6xl mx-auto w-full px-6 pt-16 pb-20">
-        
-        <% if (tiket !== null) { %>
-            
+
+        <% if (typeof tiket !=='undefined' && tiket !==null) { %>
+
             <div id="hasil-pencarian" class="animate-fade-in">
                 <div class="flex items-center justify-between mb-8">
                     <div>
                         <h2 class="font-heading text-3xl font-bold text-gray-800">Tiket Ditemukan</h2>
                         <p class="text-gray-500 mt-1 flex items-center gap-2">
-                            <span class="text-primary font-semibold"><%= getNamaKota(asal) %></span> 
-                            <i class="fa-solid fa-arrow-right-long text-gray-300"></i> 
-                            <span class="text-primary font-semibold"><%= getNamaKota(tujuan) %></span>
+                            <span class="text-primary font-semibold">
+                                <%= getNamaKota(asal) %>
+                            </span>
+                            <i class="fa-solid fa-arrow-right-long text-gray-300"></i>
+                            <span class="text-primary font-semibold">
+                                <%= getNamaKota(tujuan) %>
+                            </span>
                         </p>
                     </div>
                     <div class="hidden md:block">
-                        <span class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-full text-sm font-semibold border border-indigo-100">
+                        <span
+                            class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-full text-sm font-semibold border border-indigo-100">
                             <i class="fa-regular fa-calendar mr-2"></i>
-                            <%= new Date(tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %>
+                            <%= new Date(tanggal).toLocaleDateString('id-ID', { weekday: 'long' , day: 'numeric' ,
+                                month: 'long' , year: 'numeric' }) %>
                         </span>
                     </div>
                 </div>
 
-                <% if (tiket.length === 0) { %>
+                <% if (tiket.length===0) { %>
                     <div class="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
                         <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-red-50 mb-6">
                             <i class="fa-solid fa-face-frown-open text-4xl text-red-400"></i>
@@ -261,227 +330,402 @@
                         <h3 class="text-2xl font-bold text-gray-800">Yah, Tiket Habis!</h3>
                         <p class="text-gray-500 mt-2">Coba cari rute lain atau ganti tanggal keberangkatan.</p>
                     </div>
-                <% } else { %>
-                    
-                    <div class="space-y-6">
-                        <% tiket.forEach(function(item) { %>
-                            <div class="group bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-                                
-                                <div class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-primary to-secondary"></div>
+                    <% } else { %>
 
-                                <div class="flex flex-col md:flex-row items-center justify-between gap-6 pl-4">
-                                    
-                                    <div class="flex items-center w-full md:w-1/3 gap-4">
-                                        <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-primary text-2xl group-hover:bg-primary group-hover:text-white transition duration-300">
-                                            <i class="fa-solid fa-train"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="font-heading font-bold text-xl text-gray-800"><%= item.nama %></h4>
-                                            <span class="inline-block px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide
-                                                <%= item.kelas === 'Eksekutif' ? 'bg-purple-100 text-purple-600' : 
-                                                   item.kelas === 'Luxury' ? 'bg-amber-100 text-amber-600' : 
-                                                   'bg-gray-100 text-gray-600' %>">
-                                                <%= item.kelas %>
-                                            </span>
-                                        </div>
+                        <div class="space-y-6">
+                            <% tiket.filter(item=> item.tersedia).forEach(function(item) { %>
+                                <div class="group bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-green-100 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
+                                    data-tiket-id="<%= item.id_tiket %>">
+
+                                    <div
+                                        class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-primary to-secondary">
                                     </div>
 
-                                    <div class="flex items-center justify-center w-full md:w-1/3 gap-6">
-                                        <div class="text-center">
-                                            <p class="text-2xl font-bold text-gray-800"><%= item.berangkat %></p>
-                                            <p class="text-xs font-bold text-gray-400 uppercase"><%= item.asal %></p>
-                                        </div>
-                                        
-                                        <div class="flex flex-col items-center flex-1 px-2">
-                                            <p class="text-xs text-gray-400 mb-1"><%= item.durasi %></p>
-                                            <div class="w-full h-px bg-gray-200 relative flex items-center justify-center">
-                                                <div class="w-2 h-2 bg-gray-300 rounded-full absolute left-0"></div>
-                                                <i class="fa-solid fa-plane text-gray-300 rotate-90 text-xs mx-auto"></i> <div class="w-2 h-2 bg-gray-300 rounded-full absolute right-0"></div>
+                                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 pl-4">
+
+                                        <div class="flex items-center w-full md:w-1/3 gap-4">
+                                            <div
+                                                class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-primary text-2xl group-hover:bg-primary group-hover:text-white transition duration-300">
+                                                <i class="fa-solid fa-train"></i>
                                             </div>
-                                            <p class="text-[10px] text-green-500 font-bold mt-1">Langsung</p>
+                                            <div>
+                                                <h4 class="font-heading font-bold text-xl text-gray-800"
+                                                    data-nama-kereta>
+                                                    <%= item.nama %>
+                                                </h4>
+                                                <span
+                                                    class="inline-block px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wide bg-green-100 text-green-600"
+                                                    data-kelas>
+                                                    <%= item.kelas %>
+                                                </span>
+                                            </div>
                                         </div>
 
-                                        <div class="text-center">
-                                            <p class="text-2xl font-bold text-gray-800"><%= item.tiba %></p>
-                                            <p class="text-xs font-bold text-gray-400 uppercase"><%= item.tujuan %></p>
+                                        <div class="w-full md:w-1/3 flex flex-col items-center justify-center gap-4">
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="text-center">
+                                                    <p class="text-2xl font-bold text-gray-800" data-berangkat>
+                                                        <%= item.berangkat %>
+                                                    </p>
+                                                    <p class="text-xs text-gray-500 mt-1" data-tanggal-berangkat>
+                                                        <%= new Date(item.tanggalBerangkat).toLocaleDateString('id-ID',
+                                                            { month: 'short' , day: 'numeric' }) %>
+                                                    </p>
+                                                    <p class="text-xs font-bold text-gray-400 uppercase" data-asal>
+                                                        <%= item.namaAsal %>
+                                                    </p>
+                                                </div>
+                                                <div class="flex-1 flex justify-center">
+                                                    <i class="fa-solid fa-arrow-right-long text-gray-300 text-2xl"></i>
+                                                </div>
+                                                <div class="text-center">
+                                                    <p class="text-2xl font-bold text-gray-800" data-tiba>
+                                                        <%= item.tiba %>
+                                                    </p>
+                                                    <p class="text-xs text-gray-500 mt-1" data-tanggal-tiba>
+                                                        <%= new Date(item.tanggalTiba).toLocaleDateString('id-ID', {
+                                                            month: 'short' , day: 'numeric' }) %>
+                                                    </p>
+                                                    <p class="text-xs font-bold text-gray-400 uppercase" data-tujuan>
+                                                        <%= item.namaTujuan %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="w-full bg-green-50 border border-green-200 rounded-lg py-2 text-center">
+                                                <p class="text-sm font-bold text-green-600"><i
+                                                        class="fa-solid fa-chair mr-1"></i><span data-kursi>
+                                                        <%= item.kursiTersedia %>
+                                                    </span> Kursi Tersedia</p>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="w-full md:w-1/3 flex flex-col items-end justify-center md:pl-6 md:border-l border-gray-100">
-                                        <p class="text-sm text-gray-400">Mulai dari</p>
-                                        <p class="text-secondary font-heading font-extrabold text-2xl mb-3"><%= item.harga %></p>
-                                        <button onclick="pesanTiket('<%= item.nama %>', '<%= item.berangkat %>', '<%= item.harga %>')" 
-                                                class="w-full md:w-auto bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-2.5 px-6 rounded-xl transition duration-300 flex items-center justify-center gap-2">
-                                            Pilih Tiket
-                                        </button>
-                                    </div>
+                                        <div
+                                            class="w-full md:w-1/3 flex flex-col items-end justify-center md:pl-6 md:border-l border-gray-100">
+                                            <p class="text-sm text-gray-400">Mulai dari</p>
+                                            <p class="text-secondary font-heading font-extrabold text-2xl mb-3"
+                                                data-harga data-harga-value="<%= item.harga %>">
+                                                <%= item.hargaFormat %>
+                                            </p>
+                                            <button onclick="pesanTiket(this.closest('[data-tiket-id]'))"
+                                                class="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white font-bold py-2.5 px-6 rounded-xl hover:shadow-lg transition duration-300 flex items-center justify-center gap-2">
+                                                Pilih Tiket
+                                            </button>
+                                        </div>
 
+                                    </div>
                                 </div>
-                            </div>
-                        <% }); %>
-                    </div>
+                                <% }); %>
 
-                <% } %>
+                                    <% tiket.filter(item=> !item.tersedia).forEach(function(item) { %>
+                                        <div
+                                            class="group bg-gray-200 rounded-3xl p-6 opacity-60 relative overflow-hidden">
+                                            <div class="absolute left-0 top-0 bottom-0 w-2 bg-gray-400"></div>
+                                            <div
+                                                class="flex flex-col md:flex-row items-center justify-between gap-6 pl-4">
+                                                <div class="flex items-center w-full md:w-1/3 gap-4">
+                                                    <div
+                                                        class="w-14 h-14 rounded-2xl bg-gray-300 flex items-center justify-center text-gray-600 text-2xl">
+                                                        <i class="fa-solid fa-train"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="font-heading font-bold text-xl text-gray-600">
+                                                            <%= item.nama %>
+                                                        </h4>
+                                                        <span
+                                                            class="bg-gray-300 text-gray-600 px-3 py-1 rounded-md text-xs font-bold uppercase">
+                                                            <%= item.kelas %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full md:w-1/3 text-center">
+                                                    <div class="w-full bg-gray-300 rounded-lg py-2 text-center">
+                                                        <p class="text-sm font-bold text-gray-600"><i
+                                                                class="fa-solid fa-ban mr-1"></i>Kursi Habis</p>
+                                                    </div>
+                                                </div>
+                                                <div class="w-full md:w-1/3 flex flex-col items-end justify-center">
+                                                    <button disabled
+                                                        class="w-full md:w-auto bg-gray-400 text-gray-600 font-bold py-2.5 px-6 rounded-xl cursor-not-allowed">Habis</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                        </div>
+                        <% } %>
             </div>
-        <% } %>
-
+            <% } %>
     </div>
 
     <footer class="bg-white border-t border-gray-200 py-10 mt-auto">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+        <div
+            class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
             <div class="flex items-center gap-2 mb-4 md:mb-0">
-                <div class="w-8 h-8 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center text-white text-xs">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
                 <span class="font-bold text-gray-800 text-lg">TravelTrain</span>
             </div>
-            <div class="flex space-x-6">
-                <a href="#" class="hover:text-primary transition">Tentang Kami</a>
-                <a href="#" class="hover:text-primary transition">Kebijakan</a>
-                <a href="#" class="hover:text-primary transition">Bantuan</a>
-            </div>
-            <div class="mt-4 md:mt-0">
-                &copy; 2026 Made By D1
-            </div>
+            <div class="mt-4 md:mt-0">&copy; 2026 Made By D1</div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        flatpickr("#tanggal", {
-        dateFormat: "Y-m-d",        // Format data ke server
-        altInput: true,             // Tampilan ke user beda
-        altFormat: "j F Y",         // Contoh: 2 Januari 2026
-        minDate: "today",           // Gak bisa pilih masa lalu
-        locale: "id",               // Bahasa Indonesia
-        disableMobile: "true",      // Paksa pakai tampilan custom di HP
-        animate: true,
-    });
-        // 1. VALIDASI PENCARIAN
+        // --- 1. CONFIG FLATPICKR (DATE PICKER) ---
+        document.addEventListener('DOMContentLoaded', function () {
+            flatpickr("#tanggal", {
+                locale: 'id',
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'j F Y',
+                disableMobile: "true", // Memaksa agar calendar native HP muncul jika di HP, lebih stabil
+                defaultDate: "<%= (typeof tanggal !== 'undefined') ? tanggal : '' %>"
+            });
+        });
+
+        // --- 2. VALIDASI PENCARIAN ---
         function validasiPencarian(event) {
             const asal = document.getElementById('asal').value;
             const tujuan = document.getElementById('tujuan').value;
             const tanggal = document.getElementById('tanggal').value;
 
-            if (asal === "" || tujuan === "") {
+            if (!asal || !tujuan || !tanggal) {
                 event.preventDefault();
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Stasiun Kosong',
-                    text: 'Mau pergi kemana? Pilih stasiun dulu ya!',
-                    confirmButtonColor: '#4F46E5',
-                    iconColor: '#EC4899'
+                    title: 'Data Belum Lengkap',
+                    text: 'Harap isi stasiun asal, tujuan, dan tanggal keberangkatan.',
+                    confirmButtonColor: '#4F46E5'
                 });
-                return;
+                return false;
             }
 
             if (asal === tujuan) {
                 event.preventDefault();
                 Swal.fire({
                     icon: 'error',
-                    title: 'Rute Aneh 🤔',
-                    text: 'Masa stasiun asal dan tujuan sama? Cek lagi ya.',
+                    title: 'Rute Tidak Valid',
+                    text: 'Stasiun asal dan tujuan tidak boleh sama.',
                     confirmButtonColor: '#EC4899'
                 });
-                return;
+                return false;
             }
-
-            if (!tanggal) {
-                event.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Kapan Perginya?',
-                    text: 'Jangan lupa pilih tanggal keberangkatan.',
-                    confirmButtonColor: '#4F46E5',
-                    iconColor: '#EC4899'
-                });
-                return;
-            }
+            return true;
         }
 
-        // 2. FUNGSI PESAN TIKET (Kirim ke Backend)
-        function pesanTiket(namaKereta, jam, harga) {
-            const tgl = document.getElementById('tanggal').value;
+        // --- 3. FUNGSI PESAN TIKET ---
+        function pesanTiket(tiketElement) {
+            const idTiket = tiketElement.getAttribute('data-tiket-id');
+            const namaKereta = tiketElement.querySelector('[data-nama-kereta]').textContent;
+            const hargaFormat = tiketElement.querySelector('[data-harga]').textContent;
+            const hargaValue = tiketElement.querySelector('[data-harga-value]').getAttribute('data-harga-value');
 
+            // Tampilkan Konfirmasi SweetAlert dengan Pilihan Jumlah Penumpang
             Swal.fire({
                 title: 'Konfirmasi Pesanan',
                 html: `
-                    <div class="text-left bg-indigo-50 p-6 rounded-2xl border border-indigo-100 text-sm">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-gray-500">Kereta</span>
-                            <span class="font-bold text-gray-800">${namaKereta}</span>
-                        </div>
-                        <div class="flex justify-between mb-2">
-                            <span class="text-gray-500">Tanggal</span>
-                            <span class="font-bold text-gray-800">${tgl}</span>
-                        </div>
-                        <div class="flex justify-between mb-4">
-                            <span class="text-gray-500">Jam Berangkat</span>
-                            <span class="font-bold text-gray-800">${jam}</span>
-                        </div>
-                        <div class="border-t border-dashed border-indigo-200 pt-3 flex justify-between items-center">
-                            <span class="text-gray-500 font-semibold">Total</span>
-                            <span class="text-secondary font-extrabold text-xl">${harga}</span>
-                        </div>
+                    <div class="text-left bg-gray-50 p-4 rounded-lg text-sm mb-4">
+                        <p><strong>Kereta:</strong> ${namaKereta}</p>
+                        <p><strong>Total Harga:</strong> <span class="text-primary font-bold text-lg">${hargaFormat}</span></p>
                     </div>
+                    <p class="text-gray-600">Pilih Metode Pembayaran:</p>
                 `,
-                icon: 'question',
-                iconColor: '#4F46E5',
+                input: 'radio',
                 showCancelButton: true,
-                confirmButtonColor: '#4F46E5', // Warna Primary Baru
+                confirmButtonColor: '#4F46E5',
                 cancelButtonColor: '#ef4444',
                 confirmButtonText: 'Pesan Sekarang',
-                cancelButtonText: 'Batal',
-                background: '#fff',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl px-6 py-2.5',
-                    cancelButton: 'rounded-xl px-6 py-2.5'
-                }
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    
-                    Swal.fire({
-                        title: 'Memproses Pembayaran...',
-                        html: 'Tunggu sebentar ya...',
-                        timer: 1500,
-                        timerProgressBar: true,
-                        didOpen: () => { Swal.showLoading(); }
-                    }).then(() => {
-                        
-                        // KIRIM KE SERVER
-                        fetch('/order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                namaKereta: namaKereta,
-                                berangkat: jam,
-                                harga: harga,
-                                tanggal: tgl
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if(data.status === 'success') {
-                                Swal.fire({
-                                    title: 'Hore! Selamatt 🎉',
-                                    text: 'Kode Booking: ' + data.kode,
-                                    icon: 'success',
-                                    confirmButtonText: 'Lihat Tiketku',
-                                    confirmButtonColor: '#4F46E5',
-                                    iconColor: '#10B981'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = '/cek-pesanan';
-                                    }
-                                });
-                            }
-                        });
-
-                    });
+                    const metodeBayar = result.value;
+                    lanjutkePembayaran(idTiket, metodeBayar);
                 }
             });
         }
+
+        // --- 4. PROSES PEMBAYARAN KE SERVER ---
+        function lanjutkePembayaran(idTiket, metodeBayar) {
+
+            // Tampilkan Loading
+            Swal.fire({
+                title: 'Memproses Pemesanan...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Kirim Data ke Backend
+            fetch('/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    idTiket: parseInt(idTiket),
+                    metodeBayar: metodeBayar
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: 'Berhasil Dipesan!',
+                            html: `<p>Kode Booking Anda: <br><strong class="text-2xl text-primary font-mono mt-2 block">${data.kode}</strong>
+    </p>`,
+                            icon: 'success',
+                            confirmButtonText: 'Lihat Tiketku',
+                            confirmButtonColor: '#10B981'
+                        }).then(() => {
+                            window.location.href = '/cek-pesanan';
+                        });
+                    } else {
+                        // Jika error (misal belum login)
+                        if (data.message.includes('login')) {
+                            Swal.fire({
+                                title: 'Login Diperlukan',
+                                text: data.message,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Login Sekarang',
+                                cancelButtonText: 'Batal'
+                            }).then((res) => {
+                                if (res.isConfirmed) window.location.href = '/login';
+                            });
+                        } else {
+                            Swal.fire('Gagal', data.message, 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Terjadi kesalahan koneksi server', 'error');
+                });
+        }
     </script>
+
+    <script>
+        // --- 5. ACCOUNT DROPDOWN TOGGLE ---
+        function toggleAccountDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('dropdownMenu');
+            const accountDropdown = document.getElementById('accountDropdown');
+
+            if (dropdown && accountDropdown && !accountDropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <script>
+        // --- 6. AUTO-REFRESH TICKET AVAILABILITY ---
+        let autoRefreshInterval = null;
+
+        // Start auto-refresh when search results are displayed
+        function startAutoRefresh() {
+            // Check if we have search results
+            const hasResults = document.querySelector('[data-tiket-id]') !== null;
+            if (!hasResults) return;
+
+            console.log('🔄 Auto-refresh started - checking every 10 seconds');
+
+            // Refresh every 10 seconds
+            autoRefreshInterval = setInterval(() => {
+                refreshTicketData();
+            }, 10000);
+        }
+
+        function refreshTicketData() {
+            // Get current search parameters from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const asal = urlParams.get('asal');
+            const tujuan = urlParams.get('tujuan');
+            const tanggal = urlParams.get('tanggal');
+
+            if (!asal || !tujuan || !tanggal) return;
+
+            console.log('🔄 Refreshing ticket data...');
+
+            // Fetch updated data
+            fetch(`/ search ? asal = ${asal} & tujuan=${tujuan} & tanggal=${tanggal}`)
+                .then(response => response.text())
+                .then(html => {
+                    // Parse the HTML to extract updated ticket data
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Get all ticket cards from new data
+                    const newTickets = doc.querySelectorAll('[data-tiket-id]');
+
+                    // Update each ticket's seat availability
+                    newTickets.forEach(newTicket => {
+                        const ticketId = newTicket.getAttribute('data-tiket-id');
+                        const oldTicket = document.querySelector(`[data - tiket - id= "${ticketId}"]`);
+
+                        if (oldTicket) {
+                            const newSeats = newTicket.querySelector('[data-kursi]');
+                            const oldSeats = oldTicket.querySelector('[data-kursi]');
+
+                            if (newSeats && oldSeats) {
+                                const newCount = parseInt(newSeats.textContent);
+                                const oldCount = parseInt(oldSeats.textContent);
+
+                                // Update if changed
+                                if (newCount !== oldCount) {
+                                    oldSeats.textContent = newCount;
+                                    console.log(`✅ Updated ticket ${ticketId}: ${oldCount} → ${newCount} seats`);
+
+                                    // Flash animation to show change
+                                    const kursiContainer = oldSeats.closest('.bg-green-50');
+                                    if (kursiContainer) {
+                                        kursiContainer.classList.add('animate-pulse');
+                                        setTimeout(() => {
+                                            kursiContainer.classList.remove('animate-pulse');
+                                        }, 2000);
+                                    }
+
+                                    // Check if sold out
+                                    if (newCount <= 0) {
+                                        oldTicket.style.opacity = '0.5';
+                                        oldTicket.style.filter = 'grayscale(100%)';
+                                        const pilihBtn = oldTicket.querySelector('button');
+                                        if (pilihBtn) {
+                                            pilihBtn.disabled = true;
+                                            pilihBtn.textContent = 'Habis';
+                                            pilihBtn.classList.remove('from-primary', 'to-secondary');
+                                            pilihBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('❌ Auto-refresh error:', error);
+                });
+        }
+
+        // Stop auto-refresh when leaving page
+        window.addEventListener('beforeunload', () => {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                console.log('🛑 Auto-refresh stopped');
+            }
+        });
+
+        // Start auto-refresh when page loads (if has results)
+        document.addEventListener('DOMContentLoaded', () => {
+            startAutoRefresh();
+        });
+    </script>
+
 </body>
+
 </html>
