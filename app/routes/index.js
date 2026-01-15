@@ -66,10 +66,10 @@ router.post('/register', async (req, res) => {
         const [existing] = await pool.query('SELECT id_penumpang FROM penumpang WHERE email = ?', [email]);
         if (existing.length > 0) return res.status(400).json({ status: 'error', message: 'Email sudah terdaftar' });
 
-        const noId = Math.floor(Math.random() * 100000).toString().padStart(8, '0');
+        // Set no_id dan kontak kosong (user harus melengkapi di halaman akun)
         const [result] = await pool.execute(
             'INSERT INTO penumpang (no_id, tipe_id, nama_penumpang, email, kontak, password) VALUES (?, ?, ?, ?, ?, ?)',
-            [noId, 'KTP', nama, email, '08' + Math.floor(Math.random() * 1000000000).toString(), password]
+            ['', 'KTP', nama, email, '', password]
         );
 
         req.session.userId = result.insertId;
@@ -262,6 +262,109 @@ router.get('/search', async (req, res) => {
 // 3. TUTORIAL
 router.get('/tutorial', (req, res) => res.render('tutorial'));
 
+// 3.0 API: CHECK PROFILE COMPLETENESS
+router.get('/api/check-profile', requireLogin, async (req, res) => {
+    try {
+        const idPenumpang = req.session.userId;
+        const [userData] = await pool.query(
+            'SELECT kontak, no_id FROM penumpang WHERE id_penumpang = ?',
+            [idPenumpang]
+        );
+
+        if (userData.length === 0) {
+            return res.status(404).json({ status: 'error', message: 'User tidak ditemukan' });
+        }
+
+        const user = userData[0];
+        // Profil lengkap jika kontak dan no_id tidak kosong
+        const isComplete = user.kontak && user.kontak.trim() !== '' && user.no_id && user.no_id.trim() !== '';
+
+        res.json({ status: 'success', isComplete });
+    } catch (error) {
+        console.error('❌ Error Check Profile:', error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+});
+
+// 3.1 AKUN (Account Page)
+router.get('/akun', requireLogin, (req, res) => {
+    res.render('akun');
+});
+
+// 3.2 API: GET USER PROFILE
+router.get('/api/user-profile', requireLogin, async (req, res) => {
+    try {
+        const idPenumpang = req.session.userId;
+        const [userData] = await pool.query(
+            'SELECT id_penumpang, no_id, tipe_id, nama_penumpang, email, kontak FROM penumpang WHERE id_penumpang = ?',
+            [idPenumpang]
+        );
+
+        if (userData.length === 0) {
+            return res.status(404).json({ status: 'error', message: 'User tidak ditemukan' });
+        }
+
+        res.json({ status: 'success', user: userData[0] });
+    } catch (error) {
+        console.error('❌ Error Get Profile:', error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+});
+
+// 3.3 API: UPDATE USER PROFILE
+router.post('/api/update-profile', requireLogin, async (req, res) => {
+    try {
+        const { nama, email, kontak, tipe_id, no_id } = req.body;
+        const idPenumpang = req.session.userId;
+
+        // Validasi input
+        if (!nama || !email || !kontak || !tipe_id || !no_id) {
+            return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
+        }
+
+        // Validasi email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ status: 'error', message: 'Format email tidak valid' });
+        }
+
+        // Validasi no HP
+        if (!kontak.startsWith('08') || kontak.length < 10) {
+            return res.status(400).json({ status: 'error', message: 'No HP harus dimulai dengan 08 dan minimal 10 digit' });
+        }
+
+        // Validasi NIK jika tipe_id adalah KTP
+        if (tipe_id === 'KTP' && no_id.length !== 16) {
+            return res.status(400).json({ status: 'error', message: 'NIK KTP harus 16 digit' });
+        }
+
+        // Cek apakah email sudah digunakan oleh user lain
+        const [existingEmail] = await pool.query(
+            'SELECT id_penumpang FROM penumpang WHERE email = ? AND id_penumpang != ?',
+            [email, idPenumpang]
+        );
+
+        if (existingEmail.length > 0) {
+            return res.status(400).json({ status: 'error', message: 'Email sudah digunakan oleh akun lain' });
+        }
+
+        // Update data
+        await pool.execute(
+            'UPDATE penumpang SET nama_penumpang = ?, email = ?, kontak = ?, tipe_id = ?, no_id = ? WHERE id_penumpang = ?',
+            [nama, email, kontak, tipe_id, no_id, idPenumpang]
+        );
+
+        // Update session
+        req.session.nama = nama;
+        req.session.email = email;
+
+        res.json({ status: 'success', message: 'Data akun berhasil diperbarui' });
+    } catch (error) {
+        console.error('❌ Error Update Profile:', error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+});
+
 // 4. PROSES ORDER (Create Booking)
 router.post('/order', requireLogin, async (req, res) => {
     try {
@@ -269,6 +372,19 @@ router.post('/order', requireLogin, async (req, res) => {
         const idPenumpang = req.session.userId;
         const metodeMap = { 'bank': 'Transfer Bank', 'ewallet': 'E-Wallet', 'qris': 'QRIS' };
         const metodeDB = metodeMap[metodeBayar] || 'Transfer Bank';
+
+        // CEK KELENGKAPAN DATA DIRI
+        const [userData] = await pool.query('SELECT kontak, no_id FROM penumpang WHERE id_penumpang = ?', [idPenumpang]);
+        if (userData.length > 0) {
+            const user = userData[0];
+            if (!user.kontak || user.kontak.trim() === '' || !user.no_id || user.no_id.trim() === '') {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Harap lengkapi data diri Anda terlebih dahulu di halaman Rincian Akun',
+                    code: 'PROFILE_INCOMPLETE'
+                });
+            }
+        }
 
         const [tiketData] = await pool.query('SELECT * FROM tiket WHERE id_tiket = ?', [idTiket]);
         if (tiketData.length === 0 || tiketData[0].kursi_tersedia <= 0) {

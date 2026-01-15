@@ -147,10 +147,10 @@
                                     </p>
                                 </div>
                                 <div class="p-2">
-                                    <a href="/cek-pesanan"
+                                    <a href="/akun"
                                         class="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 rounded-lg transition">
-                                        <i class="fa-solid fa-ticket text-primary"></i>
-                                        <span>Tiket Saya</span>
+                                        <i class="fa-solid fa-user-circle text-primary"></i>
+                                        <span>Rincian Akun</span>
                                     </a>
                                     <a href="/logout"
                                         class="flex items-center gap-3 px-4 py-2 hover:bg-red-50 text-red-600 rounded-lg transition mt-1">
@@ -508,28 +508,64 @@
             const hargaFormat = tiketElement.querySelector('[data-harga]').textContent;
             const hargaValue = tiketElement.querySelector('[data-harga-value]').getAttribute('data-harga-value');
 
-            // Tampilkan Konfirmasi SweetAlert tanpa Pilihan Metode Pembayaran
-            Swal.fire({
-                title: 'Konfirmasi Pesanan',
-                html: `
-                    <div class="text-left bg-gray-50 p-4 rounded-lg text-sm mb-4">
-                        <p><strong>Kereta:</strong> ${namaKereta}</p>
-                        <p><strong>Total Harga:</strong> <span class="text-primary font-bold text-lg">${hargaFormat}</span></p>
-                    </div>
-                `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#4F46E5',
-                cancelButtonColor: '#ef4444',
-                confirmButtonText: 'Pesan Sekarang',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Langsung proses dengan metode default (bank)
-                    const metodeBayar = 'bank';
-                    lanjutkePembayaran(idTiket, metodeBayar);
-                }
-            });
+            // CEK KELENGKAPAN PROFIL TERLEBIH DAHULU
+            fetch('/api/check-profile')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && !data.isComplete) {
+                        // Profil belum lengkap, tampilkan peringatan
+                        Swal.fire({
+                            title: 'Data Diri Belum Lengkap',
+                            html: `
+                                <div class="text-left bg-yellow-50 p-4 rounded-lg text-sm mb-4">
+                                    <p class="mb-2"><i class="fa-solid fa-exclamation-triangle text-yellow-600 mr-2"></i>Harap lengkapi data diri Anda terlebih dahulu:</p>
+                                    <ul class="list-disc list-inside ml-4 text-gray-700">
+                                        <li>Nomor HP</li>
+                                        <li>Nomor Identitas (NIK/SIM/Paspor)</li>
+                                    </ul>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#4F46E5',
+                            cancelButtonColor: '#6B7280',
+                            confirmButtonText: '<i class="fa-solid fa-user-edit mr-2"></i>Lengkapi Sekarang',
+                            cancelButtonText: 'Nanti Saja'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/akun';
+                            }
+                        });
+                        return;
+                    }
+
+                    // Profil sudah lengkap, lanjutkan ke konfirmasi pemesanan
+                    Swal.fire({
+                        title: 'Konfirmasi Pesanan',
+                        html: `
+                            <div class="text-left bg-gray-50 p-4 rounded-lg text-sm mb-4">
+                                <p><strong>Kereta:</strong> ${namaKereta}</p>
+                                <p><strong>Total Harga:</strong> <span class="text-primary font-bold text-lg">${hargaFormat}</span></p>
+                            </div>
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4F46E5',
+                        cancelButtonColor: '#ef4444',
+                        confirmButtonText: 'Pesan Sekarang',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Langsung proses dengan metode default (bank)
+                            const metodeBayar = 'bank';
+                            lanjutkePembayaran(idTiket, metodeBayar);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error checking profile:', error);
+                    Swal.fire('Error', 'Terjadi kesalahan saat memeriksa profil', 'error');
+                });
         }
 
         // --- 4. PROSES PEMBAYARAN KE SERVER ---
@@ -568,8 +604,21 @@
                             window.location.href = '/cek-pesanan';
                         });
                     } else {
-                        // Jika error (misal belum login)
-                        if (data.message.includes('login')) {
+                        // Jika error profil tidak lengkap
+                        if (data.code === 'PROFILE_INCOMPLETE') {
+                            Swal.fire({
+                                title: 'Data Diri Belum Lengkap',
+                                text: data.message,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Lengkapi Sekarang',
+                                cancelButtonText: 'Batal',
+                                confirmButtonColor: '#4F46E5'
+                            }).then((res) => {
+                                if (res.isConfirmed) window.location.href = '/akun';
+                            });
+                        } else if (data.message.includes('login')) {
+                            // Jika error login
                             Swal.fire({
                                 title: 'Login Diperlukan',
                                 text: data.message,
